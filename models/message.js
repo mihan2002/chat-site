@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const messageDbConnection = mongoose.createConnection(process.env.USERS_DB_URI, {
+const messageDbConnection = mongoose.createConnection(process.env.MSG_DB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -23,10 +23,8 @@ const messageSchema = new Schema({
 });
 
 // Function to create a model for a specific user's messages
-const getMessageModel = (userId1, userId2) => {
-  // Sort user IDs to ensure consistent collection names
-  const sortedIds = [userId1, userId2].sort().join('_');
-  return messageDbConnection.model(`${sortedIds}`, messageSchema);
+const getMessageModel = (roomID) => {
+  return messageDbConnection.model(`${roomID}`, messageSchema);
 };
 
 module.exports = getMessageModel;
