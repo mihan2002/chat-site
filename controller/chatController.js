@@ -1,6 +1,7 @@
 const Message = require('../models/testmsg');
-
+const getMessageModel = require('../models/message');
 exports.handleChatMessage = async (socket, msg) => {
+
   const message = new Message({
     sender: socket.username,
     message: msg,
@@ -34,6 +35,30 @@ exports.setupSocketIO = (io) => {
       } catch (error) {
         console.error("Error handling chat message:", error);
       }
+    });
+
+    socket.on("private message", async (data) => {
+      const { recipient,username, message } = data;
+      const sender =username;
+      const Message = getMessageModel(recipient);
+
+      // Create a new message document
+      const newMessage = new Message({
+        sender,
+        message,
+      });
+      try {
+        await newMessage.save()
+        console.log("Private message saved:", newMessage);
+        io.to(recipient).emit("private message", { sender: socket.username, message });
+      } catch (error) {
+        console.error("Error saving private message:", error);
+      }
+    });
+
+    socket.on("join room", (room) => {
+      socket.join(room);
+      console.log(`${socket.username} joined room ${room}`);
     });
   });
 };

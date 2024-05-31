@@ -43,17 +43,10 @@
   </head>
   <body>
     <div class="container">
-      <button class="btn" onclick="window.location.href='/public'">publicChat</button>
-      <% users.forEach(element => { %>
-        <% if (element.username != user.username) { %>
-          <% const roomId = [element._id, user._id].sort().join(''); %>
-          <form action="/privet" method="post">
-            <input type="hidden" name="room"value="<%= roomId%>" >
-            <button  type="submit" class="btn"><%= element.username %></button>
-          </form>
-        <% } %>
-      <% }) %>
+      <button class="btn" onclick="window.location.href='/login'">Login</button>
+      <button class="btn" onclick="window.location.href='/register'">
+        Register
+      </button>
     </div>
-    </form>
   </body>
 </html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private Chat</title>
+  <style>
+    /* Basic styling */
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+    li {
+      padding: 8px;
+      margin-bottom: 4px;
+      background-color: #f4f4f4;
+    }
+    .me {
+      background-color: #add8e6; /* Blue background */
+      text-align: left; /* Align to the left */
+    }
+    input {
+      padding: 8px;
+      width: 80%;
+      margin-right: 0.5%;
+    }
+    button {
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+  <ul id="messages">
+    <% if (chatHistory) { %> <% chatHistory.forEach(function(element) { %> <%
+      if (element.sender == username) { %>
+      <li class="me"><%= element.sender %>: <%= element.message %></li>
+      <% }else {%>
+      <li ><%= element.sender %>: <%= element.message %></li>
+      <% }%> <% }); %> <% } %>
+  </ul>
+  <form id="form" action="">
+    <input id="input" autocomplete="off" /><button>Send</button>
+  </form>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io();
+    const username = "<%= username %>";
+    const room = "<%= room %>";
+
+    socket.emit("login", username);
+    socket.emit("join room", room);
+
+    var form = document.getElementById("form");
+    var input = document.getElementById("input");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (input.value) {
+        socket.emit("private message", { recipient: room,username:username, message: input.value });
+        input.value = "";
+      }
+    });
+
+    socket.on("private message", function (data) {
+      var item = document.createElement("li");
+      item.textContent = data.sender + ": " + data.message;
+
+      if (data.sender === username) {
+        item.classList.add("me");
+      }
+
+      document.getElementById("messages").appendChild(item);
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+  </script>
+</body>
+</html>

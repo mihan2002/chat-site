@@ -4,6 +4,7 @@ const http = require("http");
 const socketIo = require("socket.io");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const cookieParser = require('cookie-parser'); 
 
 const userRoutes = require('./routes/userRoutes');
 const chatController = require('./controller/chatController');
@@ -15,7 +16,7 @@ const io = socketIo(server);
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
-
+app.use(cookieParser()); 
 // Set EJS as templating engine
 app.set("view engine", "ejs");
 app.set("views", __dirname + "/views");
