@@ -5,7 +5,7 @@ const socketIo = require("socket.io");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cookieParser = require('cookie-parser'); 
-
+const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const chatController = require('./controller/chatController');
 
@@ -14,7 +14,9 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 // Middleware
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(express.static("public"));
 app.use(cookieParser()); 
 // Set EJS as templating engine
@@ -27,12 +29,6 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => {
-    console.log("Connected to MongoDB");
-  })
-  .catch((err) => {
-    console.error("Could not connect to MongoDB", err);
-  });
 
 // Use routes
 app.use('/', userRoutes);
@@ -41,6 +37,4 @@ app.use('/', userRoutes);
 chatController.setupSocketIO(io);
 
 // Server listen
-server.listen(3000, () => {
-  console.log("Listening on *:3000");
-});
+server.listen(3000);

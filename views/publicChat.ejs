@@ -3,74 +3,52 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Socket.IO Chat</title>
-    <style>
-      /* Basic styling */
-      ul {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-      }
-      li {
-        padding: 8px;
-        margin-bottom: 4px;
-        background-color: #f4f4f4;
-      }
-      .me {
-        background-color: #add8e6; /* Blue background */
-        text-align: left; /* Align to the left */
-      }
-      input {
-        padding: 8px;
-        width: 80%;
-        margin-right: 0.5%;
-      }
-      button {
-        padding: 8px;
-      }
-    </style>
+    <title>Public Chat</title>
+    <link rel="stylesheet" href="publicChat.css" />
   </head>
   <body>
-    <ul id="messages">
-      <% if (chatHistory) { %> <% chatHistory.forEach(function(element) { %> <%
-      if (element.sender == username) { %>
-      <li class="me"><%= element.sender %>: <%= element.message %></li>
-      <% }else {%>
-      <li ><%= element.sender %>: <%= element.message %></li>
-      <% }%> <% }); %> <% } %>
-    </ul>
+    <ul id="messages"></ul>
     <form id="form" action="">
       <input id="input" autocomplete="off" /><button>Send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      var socket = io();
+      document.addEventListener("DOMContentLoaded", function () {
+        var socket = io();
 
-      // Send the username to the server after connecting
-      const username = "<%= username %>";
-      socket.emit("login", username);
+        // Send the username to the server after connecting
+        const username = "<%= username %>";
+        console.log("Username:", username); // Debugging log
 
-      var form = document.getElementById("form");
-      var input = document.getElementById("input");
+        socket.emit("login", username);
 
-      form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        if (input.value) {
-          socket.emit("chat message", input.value);
-          input.value = "";
-        }
-      });
+        var form = document.getElementById("form");
+        var input = document.getElementById("input");
 
-      socket.on("chat message", function (data) {
-        var item = document.createElement("li");
-        item.textContent = data.username + ": " + data.message;
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          if (input.value) {
+            socket.emit("chat message", {
+              username: username,
+              message: input.value,
+            });
+            console.log("Sent message:", input.value); // Debugging log
+            input.value = "";
+          }
+        });
 
-        if (data.username === "<%= username %>") {
-          item.classList.add("me");
-        }
+        socket.on("chat message", function (data) {
+          console.log("Received message:", data); // Debugging log
+          var item = document.createElement("li");
+          item.textContent = data.username + ": " + data.message;
 
-        document.getElementById("messages").appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
+          if (data.username === username) {
+            item.classList.add("me");
+          }
+
+          document.getElementById("messages").appendChild(item);
+          window.scrollTo(0, document.body.scrollHeight);
+        });
       });
     </script>
   </body>

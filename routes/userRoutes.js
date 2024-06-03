@@ -1,13 +1,28 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controller/userController");
+const authController = require("../controller/authController");
+const {
+  requireAuth,
+  authUserdata,
+  authPublicChat,
+} = require("../middleware/authMiddleware");
 
-router.get("/", userController.renderEnterPage);
-router.get("/main", userController.renderMainPage);
-router.get("/login", userController.renderLogin);
-router.post("/login", userController.handleLogin);
-router.get("/register", userController.renderRegister);
-router.post("/register", userController.handleRegister);
+//main
+router.get("/", authUserdata, userController.renderMainPage);
+
+//login
+router.get("/login", authController.renderLogin);
+router.post("/login", authController.handleLogin);
+
+//logout
+router.get("/logout", authController.logOut);
+//register
+router.get("/register", authController.renderRegister);
+router.post("/register", authController.handleRegister);
+
+//chat
 router.get("/public", userController.handlePublicChat);
 router.post("/privet", userController.handlePrivateChat);
+
 module.exports = router;
