@@ -27,6 +27,6 @@ router.get("/public", authPublicChat, userController.handlePublicChat);
 
 //chat-privet
 router.get("/privet",authPrivetChat ,userController.renderPrivateChat);
-router.post("/privet", userController.handlePrivateChat);
+router.post("/privet", requireAuth,userController.handlePrivateChat);
 
 module.exports = router;

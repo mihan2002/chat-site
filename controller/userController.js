@@ -1,5 +1,3 @@
-const User = require("../models/user");
-const Msges = require("../models/testmsg");
 const GetMessageModel = require("../models/message");
 
 exports.renderMainPage = async (req, res) => {
@@ -15,5 +13,12 @@ exports.renderPrivateChat = async (req, res) => {
 };
 exports.handlePrivateChat = async (req, res) => {
   const { room } = req.body;
-  const Message = await GetMessageModel(room).find({});
+
+  try {
+    const messages = await GetMessageModel(room).find({});
+    res.status(200).json({ messages });
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };

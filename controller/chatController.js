@@ -3,6 +3,7 @@ const getMessageModel = require("../models/message");
 
 exports.setupSocketIO = (io) => {
   io.on("connection", (socket) => {
+    
     socket.on("login", (username) => {
       socket.username = username;
       console.log(`${username} has logged in`);
@@ -29,23 +30,21 @@ exports.setupSocketIO = (io) => {
       }
     });
 
-    socket.on("private-message", async (data) => {
+    socket.on("private", async (data) => {
       const { room, username, message } = data;
-      const sender = username;
-      const Message = getMessageModel(recipient);
-
-      // Create a new message document
-      const newMessage = new Message({
-        sender,
-        message,
+      const PrivetMessage = await getMessageModel(room);
+      const privetChatMessage = new PrivetMessage({
+        sender: username,
+        message: message,
       });
+
+      await privetChatMessage.save()
       try {
-        await newMessage.save();
-        console.log("Private message saved:", newMessage);
-        io.to(room).emit("private message", {
+       io.to(room).emit("private", {
           sender: socket.username,
-          message,
+          message: message,
         });
+       
       } catch (error) {
         console.error("Error saving private message:", error);
       }

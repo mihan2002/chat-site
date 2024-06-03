@@ -3,112 +3,137 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Professional Chat Interface</title>
+    <title>Chat with your friends</title>
     <link rel="stylesheet" href="privet.css" />
   </head>
   <body>
     <div class="container">
       <div class="sidebar">
         <div class="chats">Chats</div>
-        <% users.forEach(element => { %>
-        <div class="chat" onclick="changeChatName('<%= element.username %>')">
-          <%= element.username %>
-        </div>
+        <% users.forEach(user => { %>
+          <% if (user.username != owner.username) { %>
+            <div class="chat" onclick="restoreChatHistory('<%= JSON.stringify(user) %>','<%= JSON.stringify(owner) %>')">
+              <%= user.username %>
+            </div>
+          <% } %>
         <% }) %>
       </div>
+
       <div class="main">
         <div class="header" id="chat-header">Chat Name</div>
         <div class="chat-box">
-          <ul class="chat-box-ul">
-            <li><div class="message other">Text from the other end</div></li>
-            <li><div class="message me">Text from me</div></li>
+          <ul id="chat-box-ul">
+          
           </ul>
         </div>
         <div class="input-box">
           <input type="text" placeholder="Type a message" id="input" />
-          <button>Send</button>
+          <button id="send-button">Send</button>
         </div>
       </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      async function restoreChatHistory(username,chatName) {
-        // const response = await fetch("/register", {
-        //     method: "POST",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify({
-        //       username: username,
-        //       password: password,
-        //       email: email,
-        //     }),
-        //   });
+      async function restoreChatHistory(user, owner) {
+        user = JSON.parse(user);
+        owner = JSON.parse(owner);
+        changeChatName(user.username);
+        const room =setRoom(owner, user);
 
+        try {
+          const response = await fetch("/privet", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ room }),
+          });
+          const chatHistory = await response.json();
+          
 
-        // if (chatHistory) {
-        //   chatHistory.forEach((element) => {
-        //     var ul = document.getElementById("chat-box-ul");
-        //     var li = document.createElement("li");
-        //     var div = document.createElement("div");
-        //     div.textContent = chatHistory.message;
-        //     if (chatHistory.username == username) {
-        //       div.classList.add("message me");
-        //     } else {
-        //       div.classList.add("message other");
-        //     }
-        //     li.appendChild(div);
-        //     ul.appendChild(li);
-        //     // window.scrollTo(0, document.body.scrollHeight);
-        //   });
-        // }
-      }
-
-      function changeChatName(user) {
-        document.getElementById("chat-header").innerText = user.username;
-      }
-
-      let room = "";
-      let username = "";
-
-      function setDetails(owner,user){
-        room=owner._id
-
-      }
-      const socket = io();
-
-      document.addEventListener("DOMContentLoaded", function () {
-        console.log("Username:", username); // Debugging log
-
-        socket.emit("login", username);
-
+          // Clear existing chat history
+          const ul = document.getElementById("chat-box-ul");
+          
+          ul.innerHTML = '';
+          // Append chat history
+          
+            chatHistory.messages.forEach((chat) => {
+              console.log(chat);
+              var li = document.createElement("li");
+              var div = document.createElement("div");
+              div.textContent = chat.message;
+              div.classList.add("message");
+              div.classList.add(chat.sender === username ? "me" : "other");
+              li.appendChild(div);
+              ul.appendChild(li);
+            });
+          
+        } catch (error) {
+          console.error("Error fetching chat history:", error);
+        }
+    if (chatHistory) {
+      chatHistory.forEach((chat) => {
         var ul = document.getElementById("chat-box-ul");
         var li = document.createElement("li");
         var div = document.createElement("div");
-        var form = document.getElementById("form");
-        var input = document.getElementById("input");
+        div.textContent = chat.message;
+        div.classList.add("other");
+        if (chatHistory.username == username) {
+          div.classList.add("me");
+        } else {
+          div.classList.add("other");
+        }
+        li.appendChild(div);
+        ul.appendChild(li);
+        // window.scrollTo(0, document.body.scrollHeight);
+      });
+    }
+      }
 
-        form.addEventListener("submit", function (e) {
+      function changeChatName(username) {
+        document.getElementById("chat-header").innerText = username;
+      }
+
+      var room = "";
+      const username = "<%= owner.username %>";
+      
+      const socket = io();
+
+      function setRoom(owner, user) {
+        room = [user._id, owner._id].sort().join("");
+        socket.emit("join-room", room);
+        return room;
+      }
+
+      socket.emit("login", username);
+
+      document.addEventListener("DOMContentLoaded", function () {
+        var button = document.getElementById("send-button");
+        var input = document.getElementById("input");
+        console.log('ft ft');
+        
+        button.addEventListener("click", function (e) {
           e.preventDefault();
           if (input.value) {
-            socket.emit("private-message", {
+            socket.emit("private", {
               room: room,
-              username: "<%= username %>",
+              username: username,
               message: input.value,
             });
             input.value = "";
           }
         });
 
-        socket.on("private-message", function (data) {
-          const item = document.createElement("li");
-          const messageDiv = document.createElement("div");
-          messageDiv.textContent = `${data.message}`;
-          messageDiv.classList.add(
-            data.sender === "<%= username %>" ? "me" : "other"
-          );
-          item.appendChild(messageDiv);
-          messages.appendChild(item);
+        socket.on("private", function (data) {
+          var ul = document.getElementById("chat-box-ul");
+          var li = document.createElement("li");
+          var div = document.createElement("div");
+          console.log(data);
+          div.textContent = `${data.message}`;
+          div.classList.add("message");
+          div.classList.add(data.sender === username ? "me" : "other");
+          li.appendChild(div);
+          ul.appendChild(li);
           window.scrollTo(0, document.body.scrollHeight);
         });
       });
