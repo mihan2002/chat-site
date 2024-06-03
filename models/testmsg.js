@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const messageDbConnection = mongoose.createConnection(
-  process.env.MSG_Groups_DB_URI,
+  process.env.Public_Chat_DB_URI,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -26,6 +26,6 @@ const messageSchema = new Schema({
 });
 
 // Function to create a model for a specific user's messages
-const MessageModel = messageDbConnection.model(`group_messages`, messageSchema);
+const PublicChatMessageModel = messageDbConnection.model(`group_messages`, messageSchema);
 
-module.exports = MessageModel;
+module.exports = PublicChatMessageModel;

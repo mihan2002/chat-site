@@ -1,8 +1,8 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const Message = require("../models/testmsg");
-Message;
+const PublicChatMessageModel = require("../models/testmsg");
+
 const requireAuth = (req, res, next) => {
   const token = req.cookies.jwt;
 
@@ -52,9 +52,10 @@ const authPublicChat = (req, res, next) => {
         res.redirect("/login");
       } else {
         const user = await User.findById(decodedToken.id);
-        const chatHistory = await Message.find({});
-        res.locals.username = user;
-        res.locals.chatHistory = chatHistory;
+        const publicChat = await PublicChatMessageModel.find({});
+
+        res.locals.username = user.username;
+        res.locals.chatHistory = publicChat;
         next();
       }
     });
@@ -63,4 +64,26 @@ const authPublicChat = (req, res, next) => {
   }
 };
 
-module.exports = { requireAuth, authUserdata, authPublicChat };
+const authPrivetChat = (req, res, next) => {
+  const token = req.cookies.jwt;
+
+  if (token) {
+    jwt.verify(token, process.env.JWT_SECRET, async (error, decodedToken) => {
+      if (error) {
+        console.log(error.message);
+        res.redirect("/login");
+      } else {
+        const user = await User.findById(decodedToken.id);
+        const users = await User.find({});
+
+        res.locals.owner = user;
+        res.locals.users = users;
+        next();
+      }
+    });
+  } else {
+    res.redirect("/login");
+  }
+};
+authPrivetChat;
+module.exports = { requireAuth, authUserdata, authPublicChat, authPrivetChat };

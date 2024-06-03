@@ -10,13 +10,10 @@ exports.handlePublicChat = async (req, res) => {
   res.render("publicChat");
 };
 
+exports.renderPrivateChat = async (req, res) => {
+  res.render("privateChat");
+};
 exports.handlePrivateChat = async (req, res) => {
   const { room } = req.body;
   const Message = await GetMessageModel(room).find({});
-  const user = req.cookies.user;
-  res.render("privateChat", {
-    room: room,
-    username: user.username,
-    chatHistory: Message,
-  });
 };

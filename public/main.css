@@ -1,16 +1,59 @@
-/* styles.css */
 body {
   font-family: Arial, sans-serif;
   background-color: #f4f4f4;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
   margin: 0;
 }
 
 .container {
-  text-align: center;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.header {
+  width: 100%;
+  background-color: #333;
+  color: white;
+  padding: 10px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.navbar h1 {
+  margin: 0;
+}
+
+.navbar ul {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar ul li {
+  display: inline;
+}
+
+.navbar ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+.navbar ul li a:hover {
+  text-decoration: underline;
+}
+
+.btn-container {
+  margin-top: 60px; /* Adjust as necessary */
 }
 
 .btn {
@@ -30,44 +73,4 @@ body {
 
 .btn:hover {
   background-color: #0056b3;
-}
-
-/* Header styles */
-header {
-  width: 100%;
-  background-color: #333;
-  color: white;
-  padding: 10px 0;
-}
-
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-}
-
-nav h1 {
-  margin: 0;
-}
-
-nav ul {
-  list-style: none;
-  display: flex;
-  gap: 15px;
-  margin: 0;
-  padding: 0;
-}
-
-nav ul li {
-  display: inline;
-}
-
-nav ul li a {
-  color: white;
-  text-decoration: none;
-}
-
-nav ul li a:hover {
-  text-decoration: underline;
 }

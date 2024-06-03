@@ -1,22 +1,5 @@
-const Message = require('../models/testmsg');
-const getMessageModel = require('../models/message');
-
-exports.handleChatMessage = async (socket, msg) => {
-
-  const message = new Message({
-    sender: socket.username,
-    message: msg,
-  });
-
-  try {
-    await message.save();
-    console.log("Message saved:", message);
-    return message;
-  } catch (error) {
-    console.error("Error saving message:", error);
-    throw error;
-  }
-};
+const PublicChatMessageModel = require("../models/testmsg");
+const getMessageModel = require("../models/message");
 
 exports.setupSocketIO = (io) => {
   io.on("connection", (socket) => {
@@ -29,18 +12,26 @@ exports.setupSocketIO = (io) => {
       console.log(`${socket.username} disconnected`);
     });
 
-    socket.on("chat message", async (msg) => {
+    socket.on("public-chat", async (msg) => {
       try {
-        const message = await exports.handleChatMessage(socket, msg);
-        io.emit("chat message", { username: socket.username, message: msg });
+        const publicMessages = new PublicChatMessageModel({
+          sender: msg.username,
+          message: msg.message,
+        });
+        await publicMessages.save();
+
+        io.emit("public-chat", {
+          username: msg.username,
+          message: msg.message,
+        });
       } catch (error) {
         console.error("Error handling chat message:", error);
       }
     });
 
-    socket.on("private message", async (data) => {
-      const { recipient,username, message } = data;
-      const sender =username;
+    socket.on("private-message", async (data) => {
+      const { room, username, message } = data;
+      const sender = username;
       const Message = getMessageModel(recipient);
 
       // Create a new message document
@@ -49,15 +40,18 @@ exports.setupSocketIO = (io) => {
         message,
       });
       try {
-        await newMessage.save()
+        await newMessage.save();
         console.log("Private message saved:", newMessage);
-        io.to(recipient).emit("private message", { sender: socket.username, message });
+        io.to(room).emit("private message", {
+          sender: socket.username,
+          message,
+        });
       } catch (error) {
         console.error("Error saving private message:", error);
       }
     });
 
-    socket.on("join room", (room) => {
+    socket.on("join-room", (room) => {
       socket.join(room);
       console.log(`${socket.username} joined room ${room}`);
     });

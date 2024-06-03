@@ -7,7 +7,7 @@
     <h1>Chat with ur friends</h1>
     <ul>
       <% if (user) { %>
-      <li>Welcome <%= user.email %></li>
+      <li>Welcome <%= user.username %></li>
       <li><a href="/logout">Log Out</a></li>
       <% }else {%>
       <li><a href="/login">Log In</a></li>

@@ -7,10 +7,26 @@
     <link rel="stylesheet" href="/main.css" />
   </head>
   <body>
-    <div><%- include('./partials/header.ejs') %></div>
+    <header class="header">
+      <nav class="navbar">
+        <h1>Chat with ur friends</h1>
+        <ul>
+          <% if (user) { %>
+          <li>Welcome <%= user.username %></li>
+          <li><a href="/logout">Log Out</a></li>
+          <% }else {%>
+          <li><a href="/login">Log In</a></li>
+          <li><a href="/register">Register</a></li>
+          <% } %>
+        </ul>
+      </nav>
+    </header>
     <div class="container">
       <button class="btn" onclick="window.location.href='/public'">
-        publicChat
+        public Chat
+      </button>
+      <button class="btn" onclick="window.location.href='/privet'">
+        privet Chat
       </button>
     </div>
   </body>

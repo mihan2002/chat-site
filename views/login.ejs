@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="login.css" />
   </head>
   <body>
     <div class="container">
@@ -46,15 +46,16 @@
             });
 
             const data = await response.json();
-
+            console.log("asdsad");
+            console.log(data);
             const emailError = document.getElementById("email-error");
             const passwordError = document.getElementById("password-error");
             if (data.error) {
               emailError.textContent = data.error.email;
               passwordError.textContent = data.error.password;
-            }
-            if (data.user) {
-              location.assign("/main");
+            } else {
+              console.log("ftftftftf");
+              location.assign("/");
             }
           } catch (error) {
             console.log(error);

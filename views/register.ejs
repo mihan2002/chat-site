@@ -38,7 +38,7 @@
           const password = document.getElementById("password").value;
           const email = document.getElementById("email").value;
 
-          const response = await fetch("http://localhost:3000/register", {
+          const response = await fetch("/register", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -58,7 +58,7 @@
             emailError.textContent = data.error.email;
             passwordError.textContent = data.error.password;
           } else {
-            location.assign("/login");
+            location.assign("/");
           }
         });
     </script>
