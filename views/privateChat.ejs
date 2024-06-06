@@ -19,17 +19,8 @@
         <% }) %>
       </div>
 
-      <div class="main">
-        <div class="header" id="chat-header">Chat Name</div>
-        <div class="chat-box">
-          <ul id="chat-box-ul">
-          
-          </ul>
-        </div>
-        <div class="input-box">
-          <input type="text" placeholder="Type a message" id="input" />
-          <button id="send-button">Send</button>
-        </div>
+      <div class="main" id="main">
+        <div class="dummy-text"><h2>Chat with friends</h2></div>
       </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
@@ -37,8 +28,9 @@
       async function restoreChatHistory(user, owner) {
         user = JSON.parse(user);
         owner = JSON.parse(owner);
+        changeUI();
         changeChatName(user.username);
-        const room =setRoom(owner, user);
+        const room = setRoom(owner, user);
 
         try {
           const response = await fetch("/privet", {
@@ -48,46 +40,40 @@
             },
             body: JSON.stringify({ room }),
           });
-          const chatHistory = await response.json();
-          
+          if(response.ok) {
+            const chatHistory = await response.json();
 
-          // Clear existing chat history
-          const ul = document.getElementById("chat-box-ul");
-          
-          ul.innerHTML = '';
-          // Append chat history
-          
+            // Clear existing chat history
+            const ul = document.getElementById("chat-box-ul");
+            ul.innerHTML = '';
+
+            // Append chat history
             chatHistory.messages.forEach((chat) => {
-              console.log(chat);
               var li = document.createElement("li");
               var div = document.createElement("div");
               div.textContent = chat.message;
               div.classList.add("message");
-              div.classList.add(chat.sender === username ? "me" : "other");
+              div.classList.add(chat.sender === owner.username ? "me" : "other");
               li.appendChild(div);
               ul.appendChild(li);
             });
-          
+          }
         } catch (error) {
           console.error("Error fetching chat history:", error);
         }
-    if (chatHistory) {
-      chatHistory.forEach((chat) => {
-        var ul = document.getElementById("chat-box-ul");
-        var li = document.createElement("li");
-        var div = document.createElement("div");
-        div.textContent = chat.message;
-        div.classList.add("other");
-        if (chatHistory.username == username) {
-          div.classList.add("me");
-        } else {
-          div.classList.add("other");
-        }
-        li.appendChild(div);
-        ul.appendChild(li);
-        // window.scrollTo(0, document.body.scrollHeight);
-      });
-    }
+      }
+
+      function changeUI() {
+        document.getElementById("main").innerHTML = `
+        <div class="header" id="chat-header">Chat Name</div>
+        <div class="chat-box">
+          <ul id="chat-box-ul"></ul>
+        </div>
+        <div class="input-box">
+          <input type="text" placeholder="Type a message" id="input" />
+          <button id="send-button">Send</button>
+        </div>`;
+        addSendButtonListener();
       }
 
       function changeChatName(username) {
@@ -96,7 +82,7 @@
 
       var room = "";
       const username = "<%= owner.username %>";
-      
+
       const socket = io();
 
       function setRoom(owner, user) {
@@ -107,11 +93,10 @@
 
       socket.emit("login", username);
 
-      document.addEventListener("DOMContentLoaded", function () {
-        var button = document.getElementById("send-button");
-        var input = document.getElementById("input");
-        console.log('ft ft');
-        
+      function addSendButtonListener() {
+        const button = document.getElementById("send-button");
+        const input = document.getElementById("input");
+
         button.addEventListener("click", function (e) {
           e.preventDefault();
           if (input.value) {
@@ -123,19 +108,18 @@
             input.value = "";
           }
         });
+      }
 
-        socket.on("private", function (data) {
-          var ul = document.getElementById("chat-box-ul");
-          var li = document.createElement("li");
-          var div = document.createElement("div");
-          console.log(data);
-          div.textContent = `${data.message}`;
-          div.classList.add("message");
-          div.classList.add(data.sender === username ? "me" : "other");
-          li.appendChild(div);
-          ul.appendChild(li);
-          window.scrollTo(0, document.body.scrollHeight);
-        });
+      socket.on("private", function (data) {
+        const ul = document.getElementById("chat-box-ul");
+        const li = document.createElement("li");
+        const div = document.createElement("div");
+        div.textContent = data.message;
+        div.classList.add("message");
+        div.classList.add(data.sender === username ? "me" : "other");
+        li.appendChild(div);
+        ul.appendChild(li);
+        window.scrollTo(0, document.body.scrollHeight);
       });
     </script>
   </body>

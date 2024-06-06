@@ -1,0 +1,73 @@
+  /* Style the body */
+  body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 20px;
+  }
+
+  /* Style the search bar container */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  /* Style the input field */
+  #user-name {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    flex: 1;
+    margin-right: 10px;
+  }
+
+  /* Style the search button */
+  #serch-button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  /* Style the results list */
+  #results {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Style the list items */
+  #results li {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: flex; /* Keep this for horizontal layout */
+    align-items: center; /* Keep this for vertical alignment */
+  }
+
+  /* Style the user container */
+  .user {
+    display: flex; /* Added to hold username and button horizontally */
+    align-items: center; /* Added to vertically align elements */
+  }
+
+  /* Style the username text */
+  .user-text {
+    flex: 1;
+    margin-right: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  /* Style the add button */
+  .user button {
+    padding: 5px 10px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }

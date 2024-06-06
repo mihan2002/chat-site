@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search friends</title>
+    <link rel="stylesheet" href="addFriend.css" />
+  </head>
+  <body>
+    <div class="search-bar">
+      <input type="text" id="user-name" />
+      <button id="serch-button">search</button>
+    </div>
+    <div>
+      <ul id="results"></ul>
+    </div>
+
+    <script>
+      async function addUser(userId) {
+        try {
+          const response = await fetch("/add-friend", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              _id: "<%=_id%>",
+              userId: userId,
+            }),
+          });
+
+          const data = await response.json();
+          if (response) {
+            document.getElementById("add-button").textContent = "sent";
+          }
+          console.log(data);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      document
+        .getElementById("serch-button")
+        .addEventListener("click", async function (event) {
+          event.preventDefault();
+
+          const username = document.getElementById("user-name").value;
+
+          try {
+            const response = await fetch("/show-users", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                username,
+              }),
+            });
+
+            const data = await response.json();
+            const ul = document.getElementById("results");
+            ul.innerHTML = "";
+
+            data.user.forEach((element) => {
+              const li = document.createElement("li");
+              console.log("<%=_id%>");
+              if (element.friends.includes("<%=_id%>")) {
+                li.innerHTML = `<div class="user"><div class ="user-text">${element.username}</div><button id="add-button">friend</button></div>`;
+              } else if (element.request.includes("<%=_id%>")) {
+                li.innerHTML = `<div class="user"><div class ="user-text">${element.username}</div><button  id="add-button">sent</button></div>`;
+              } else {
+                li.innerHTML = `<div class="user"><div class ="user-text">${element.username}</div><button onclick=addUser("${element._id}") id="add-button">add</button></div>`;
+              }
+              ul.appendChild(li);
+            });
+          } catch (error) {
+            console.log(error);
+          }
+        });
+    </script>
+  </body>
+</html>

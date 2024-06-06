@@ -12,6 +12,7 @@ const requireAuth = (req, res, next) => {
         console.log(error.message);
         res.redirect("/login");
       } else {
+        res.locals._id = decodedToken.id;
         next();
       }
     });
@@ -30,9 +31,19 @@ const authUserdata = (req, res, next) => {
         res.locals.user = null;
         next();
       } else {
-        const user = await User.findById(decodedToken.id);
-        res.locals.user = user;
-        next();
+        try {
+          const user = await User.getFriendRequests(decodedToken.id);
+          if (user) {
+            console.log(user);
+            user._id = decodedToken.id;
+            res.locals.user = user;
+          }
+          next();
+        } catch (error) {
+          console.log(error);
+          res.locals.user = null;
+          next();
+        }
       }
     });
   } else {
@@ -72,11 +83,9 @@ const authPrivetChat = (req, res, next) => {
         console.log(error.message);
         res.redirect("/login");
       } else {
-        const user = await User.findById(decodedToken.id);
-        const users = await User.find({});
-
+        const user = await User.findById(decodedToken.id).populate("friends");
         res.locals.owner = user;
-        res.locals.users = users;
+        res.locals.users = user.friends;
         next();
       }
     });

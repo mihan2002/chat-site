@@ -3,7 +3,6 @@ const getMessageModel = require("../models/message");
 
 exports.setupSocketIO = (io) => {
   io.on("connection", (socket) => {
-    
     socket.on("login", (username) => {
       socket.username = username;
       console.log(`${username} has logged in`);
@@ -32,19 +31,19 @@ exports.setupSocketIO = (io) => {
 
     socket.on("private", async (data) => {
       const { room, username, message } = data;
+      console.log(data);
       const PrivetMessage = await getMessageModel(room);
       const privetChatMessage = new PrivetMessage({
         sender: username,
         message: message,
       });
 
-      await privetChatMessage.save()
+      await privetChatMessage.save();
       try {
-       io.to(room).emit("private", {
+        io.to(room).emit("private", {
           sender: socket.username,
           message: message,
         });
-       
       } catch (error) {
         console.error("Error saving private message:", error);
       }

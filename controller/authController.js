@@ -9,7 +9,7 @@ const handleErrors = (err) => {
     error.email = "this email is not registered";
   }
   if (err.message === "incorrect password") {
-    error.email = "this password is incorrect";
+    error.password = "this password is incorrect";
   }
 
   //duplicate error code
@@ -59,6 +59,7 @@ exports.handleLogin = async (req, res) => {
 
   try {
     const user = await User.login(email, password);
+
     const token = createToken(user._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
     res.status(200).json({ user: user._id });

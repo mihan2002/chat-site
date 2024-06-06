@@ -115,3 +115,10 @@ button {
   border: none;
   background-color: #3b5998;
 }
+
+.dummy-text {
+  justify-content: center;
+  display: flex;
+  padding-top: 40vh;
+  
+}

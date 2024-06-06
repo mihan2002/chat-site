@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Request page</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+      }
+
+      #friend-requests {
+        list-style: none;
+        padding: 0;
+        margin: 20px auto;
+        max-width: 600px;
+      }
+
+      #friend-requests li {
+        background: white;
+        padding: 20px;
+        margin: 10px 0;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      #friend-requests h2 {
+        margin: 0;
+        font-size: 1.2em;
+        color: #333;
+      }
+
+      .accept-button,
+      .decline-button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 1em;
+      }
+
+      .accept-button {
+        background-color: #4CAF50;
+        color: white;
+        margin-right: 10px;
+      }
+
+      .accept-button:hover {
+        background-color: #45a049;
+      }
+
+      .decline-button {
+        background-color: #f44336;
+        color: white;
+      }
+
+      .decline-button:hover {
+        background-color: #e53935;
+      }
+    </style>
+  </head>
+  <body>
+    <ul id="friend-requests"></ul>
+  </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const user = <%- JSON.stringify(user) %>;
+      
+      user.requests.forEach((request) => {
+        const li = document.createElement("li");
+        li.id = request._id;
+        li.innerHTML = `<h2>${request.username}</h2>
+                        <div>
+                          <button class="accept-button" onclick="acceptDeclineUser('${request._id}', true)">Accept</button>
+                          <button class="decline-button" onclick="acceptDeclineUser('${request._id}', false)">Decline</button>
+                        </div>`;
+        document.getElementById("friend-requests").appendChild(li);
+      });
+    });
+
+    async function acceptDeclineUser(requestId, acceptDecline) {
+      const user = <%- JSON.stringify(user) %>;
+      console.log(user);
+      try {
+        const response = await fetch("/accept-decline-friend", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user._id,
+            requestId: requestId,
+            accept: acceptDecline
+          }),
+        });
+        if (response.ok) {
+          document.getElementById(requestId).remove();
+        } else {
+          console.log("Failed to accept/decline friend request");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  </script>
+</html>
