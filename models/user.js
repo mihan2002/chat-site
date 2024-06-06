@@ -38,14 +38,12 @@ const userSchema = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: "User",
-      unique: [true, "user already is a friend"],
     },
   ],
   request: [
     {
       type: Schema.Types.ObjectId,
       ref: "User",
-      unique: [true, "user request already exist"],
     },
   ],
 });
@@ -109,6 +107,7 @@ userSchema.statics.acceptOrDeclineRequest = async function (
     // Add the friend to the friends array
     if (accept) {
       if (!me.friends.includes(friendId)) {
+        console.log("friend");
         me.friends.push(friendId);
         friend.friends.push(myId);
       } else {

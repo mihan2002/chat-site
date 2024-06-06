@@ -37,14 +37,14 @@ exports.renderRegister = (req, res) => {
 
 exports.handleRegister = async (req, res) => {
   const { username, password, email } = req.body;
-
   try {
-    const newUser = await User.create({ username, email, password });
+    const newUser = await User.create({ username, email, password,friends:[],request:[]});
     const token = createToken(newUser._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
     res.status(201).json({ user: newUser._id });
   } catch (err) {
     const error = handleErrors(err);
+    console.log(err);
     res.status(400).json({ error });
   }
 };
@@ -59,7 +59,6 @@ exports.handleLogin = async (req, res) => {
 
   try {
     const user = await User.login(email, password);
-
     const token = createToken(user._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
     res.status(200).json({ user: user._id });
